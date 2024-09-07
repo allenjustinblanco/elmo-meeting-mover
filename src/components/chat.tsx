@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { AvatarSelector } from "./AvatarSelector";
 
 interface ChatMessage {
   id: string;
@@ -26,12 +27,19 @@ interface ChatProps {
   userId: string;
 }
 
+interface Emoji {
+  native: string;
+  unified: string;
+  shortName: string;
+}
+
 export function Chat({ roomId, userId }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { sendMessage } = useFirebase(roomId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [avatarStyle, setAvatarStyle] = useState("notionists");
 
   useEffect(() => {
     const messagesRef = collection(db, "rooms", roomId, "messages");
@@ -64,8 +72,8 @@ export function Chat({ roomId, userId }: ChatProps) {
     }
   };
 
-  const handleEmojiSelect = (emoji: string) => {
-    setNewMessage((prev) => prev + emoji);
+  const handleEmojiSelect = (emoji: Emoji) => {
+    setNewMessage((prev) => prev + emoji.native);
     setShowEmojiPicker(false);
   };
 
@@ -92,6 +100,13 @@ export function Chat({ roomId, userId }: ChatProps) {
 
   return (
     <div className="flex flex-col h-full bg-background">
+      <div className="p-4 border-b">
+        <AvatarSelector
+          userId={userId}
+          selectedStyle={avatarStyle}
+          onStyleChange={setAvatarStyle}
+        />
+      </div>
       <div className="flex-grow overflow-y-auto space-y-4 p-4">
         {messageGroups.map((group, groupIndex) => (
           <div
@@ -103,7 +118,7 @@ export function Chat({ roomId, userId }: ChatProps) {
             >
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src={`https://api.dicebear.com/6.x/initials/svg?seed=${group[0].userId}`}
+                  src={`https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${group[0].userId}`}
                 />
                 <AvatarFallback>
                   {group[0].userId.slice(0, 2).toUpperCase()}

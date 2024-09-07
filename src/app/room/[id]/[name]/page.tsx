@@ -400,13 +400,21 @@ export default function Room({
                     </p>
                   </div>
                 )}
-                <Button
-                  variant="outline"
-                  onClick={() => setIsActive(!isActive)}
-                  className="w-full"
-                >
-                  {isActive ? "Pause Timer" : "Start Timer"}
-                </Button>
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={() => setIsActive(!isActive)}
+                    className="flex-grow"
+                  >
+                    {isActive ? "Pause Timer" : "Start Timer"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setTimer(0)}
+                    className="flex-grow"
+                  >
+                    Reset Timer
+                  </Button>
+                </div>
               </div>
               <div className="space-y-4 md:col-span-2">
                 <Tabs defaultValue="agenda" className="w-full">
@@ -416,74 +424,78 @@ export default function Room({
                     <TabsTrigger value="chat">Chat</TabsTrigger>
                     <TabsTrigger value="summary">Summary</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="agenda">
-                    <MeetingAgenda
-                      roomId={params.id}
-                      agenda={agenda}
-                      updateAgenda={updateAgenda}
-                    />
-                  </TabsContent>
-                  <TabsContent value="notes">
-                    <MeetingNotes roomId={params.id} />
-                  </TabsContent>
-                  <TabsContent value="chat">
-                    <div className="h-[400px]">
+                  <div className="h-[500px] overflow-y-auto">
+                    <TabsContent value="agenda" className="h-full">
+                      <MeetingAgenda
+                        roomId={params.id}
+                        agenda={agenda}
+                        updateAgenda={updateAgenda}
+                      />
+                    </TabsContent>
+                    <TabsContent value="notes" className="h-full">
+                      <MeetingNotes roomId={params.id} />
+                    </TabsContent>
+                    <TabsContent value="chat" className="h-full">
                       <Chat roomId={params.id} userId={userId} />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="summary">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Meeting Summary</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div>
-                            <h3 className="font-semibold">Add Decision</h3>
-                            <div className="flex space-x-2">
-                              <Input
-                                value={decision}
-                                onChange={(e) => setDecision(e.target.value)}
-                                placeholder="Enter a decision"
-                              />
-                              <Button onClick={handleAddDecision}>Add</Button>
+                    </TabsContent>
+                    <TabsContent value="summary" className="h-full">
+                      <Card className="h-full overflow-y-auto">
+                        <CardHeader>
+                          <CardTitle>Meeting Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <h3 className="font-semibold">Add Decision</h3>
+                              <div className="flex space-x-2">
+                                <Input
+                                  value={decision}
+                                  onChange={(e) => setDecision(e.target.value)}
+                                  placeholder="Enter a decision"
+                                />
+                                <Button onClick={handleAddDecision}>Add</Button>
+                              </div>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">Add Action Item</h3>
+                              <div className="flex space-x-2">
+                                <Input
+                                  value={actionItem}
+                                  onChange={(e) =>
+                                    setActionItem(e.target.value)
+                                  }
+                                  placeholder="Enter an action item"
+                                />
+                                <Button onClick={handleAddActionItem}>
+                                  Add
+                                </Button>
+                              </div>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">Decisions</h3>
+                              <ul className="list-disc pl-5">
+                                {roomData.summary.decisions.map(
+                                  (decision, index) => (
+                                    <li key={index}>{decision}</li>
+                                  ),
+                                )}
+                              </ul>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">Action Items</h3>
+                              <ul className="list-disc pl-5">
+                                {roomData.summary.actionItems.map(
+                                  (item, index) => (
+                                    <li key={index}>{item}</li>
+                                  ),
+                                )}
+                              </ul>
                             </div>
                           </div>
-                          <div>
-                            <h3 className="font-semibold">Add Action Item</h3>
-                            <div className="flex space-x-2">
-                              <Input
-                                value={actionItem}
-                                onChange={(e) => setActionItem(e.target.value)}
-                                placeholder="Enter an action item"
-                              />
-                              <Button onClick={handleAddActionItem}>Add</Button>
-                            </div>
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">Decisions</h3>
-                            <ul className="list-disc pl-5">
-                              {roomData.summary.decisions.map(
-                                (decision, index) => (
-                                  <li key={index}>{decision}</li>
-                                ),
-                              )}
-                            </ul>
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">Action Items</h3>
-                            <ul className="list-disc pl-5">
-                              {roomData.summary.actionItems.map(
-                                (item, index) => (
-                                  <li key={index}>{item}</li>
-                                ),
-                              )}
-                            </ul>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </div>
                 </Tabs>
               </div>
             </div>
