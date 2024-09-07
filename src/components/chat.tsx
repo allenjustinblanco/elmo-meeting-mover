@@ -64,8 +64,8 @@ export function Chat({ roomId, userId }: ChatProps) {
     }
   };
 
-  const handleEmojiSelect = (emoji: any) => {
-    setNewMessage((prev) => prev + emoji.native);
+  const handleEmojiSelect = (emoji: string) => {
+    setNewMessage((prev) => prev + emoji);
     setShowEmojiPicker(false);
   };
 

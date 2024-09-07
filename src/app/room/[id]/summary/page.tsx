@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,13 +34,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 export default function RoomSummary({ params }: { params: { id: string } }) {
   const [newDecision, setNewDecision] = useState("");
   const [newActionItem, setNewActionItem] = useState("");
   const router = useRouter();
   const { toast } = useToast();
-  const { roomData, updateRoomData, archiveRoom } = useFirebase(params.id);
+  const { roomData, archiveRoom, addDecision, addActionItem } = useFirebase(
+    params.id,
+  );
 
   const handleArchive = async () => {
     try {
@@ -75,9 +77,8 @@ export default function RoomSummary({ params }: { params: { id: string } }) {
 
   const handleAddDecision = () => {
     if (newDecision.trim()) {
-      updateRoomData({
-        decisions: [...(roomData.decisions || []), newDecision],
-      });
+      addDecision(newDecision);
+
       setNewDecision("");
       toast({
         title: "Decision Added",
@@ -88,9 +89,7 @@ export default function RoomSummary({ params }: { params: { id: string } }) {
 
   const handleAddActionItem = () => {
     if (newActionItem.trim()) {
-      updateRoomData({
-        actionItems: [...(roomData.actionItems || []), newActionItem],
-      });
+      addActionItem(newActionItem);
       setNewActionItem("");
       toast({
         title: "Action Item Added",
@@ -178,10 +177,13 @@ export default function RoomSummary({ params }: { params: { id: string } }) {
                 </Button>
               </div>
               <ul className="list-disc pl-5 space-y-1">
-                {roomData.decisions && roomData.decisions.length > 0 ? (
-                  roomData.decisions.map((decision: string, index: number) => (
-                    <li key={index}>{decision}</li>
-                  ))
+                {roomData.summary.decisions &&
+                roomData.summary.decisions.length > 0 ? (
+                  roomData.summary.decisions.map(
+                    (decision: string, index: number) => (
+                      <li key={index}>{decision}</li>
+                    ),
+                  )
                 ) : (
                   <li>No key decisions recorded</li>
                 )}
@@ -202,10 +204,13 @@ export default function RoomSummary({ params }: { params: { id: string } }) {
                 </Button>
               </div>
               <ul className="list-disc pl-5 space-y-1">
-                {roomData.actionItems && roomData.actionItems.length > 0 ? (
-                  roomData.actionItems.map((item: string, index: number) => (
-                    <li key={index}>{item}</li>
-                  ))
+                {roomData.summary.actionItems &&
+                roomData.summary.actionItems.length > 0 ? (
+                  roomData.summary.actionItems.map(
+                    (item: string, index: number) => (
+                      <li key={index}>{item}</li>
+                    ),
+                  )
                 ) : (
                   <li>No action items recorded</li>
                 )}
@@ -222,11 +227,14 @@ export default function RoomSummary({ params }: { params: { id: string } }) {
             <TabsContent value="chat">
               <h3 className="text-lg font-semibold mb-2">Chat Log</h3>
               <div className="space-y-2">
-                {roomData.chatLog && roomData.chatLog.length > 0 ? (
-                  roomData.chatLog.map((message: any, index: number) => (
+                {roomData.messages && roomData.messages.length > 0 ? (
+                  roomData.messages.map((message, index) => (
                     <div key={index} className="flex items-start space-x-2">
-                      <span className="font-semibold">{message.sender}:</span>
-                      <span>{message.text}</span>
+                      <span className="font-semibold">{message.userId}:</span>
+                      <span>{message.message}</span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(message.timestamp).toLocaleString()}
+                      </span>
                     </div>
                   ))
                 ) : (

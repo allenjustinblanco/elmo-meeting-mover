@@ -18,10 +18,11 @@ import { useFirebase } from "@/hooks/useFirebase";
 
 export default function Home() {
   const [roomName, setRoomName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const router = useRouter();
   const { userId, userName, setUserName } = useUser();
   const { createRoom } = useFirebase();
+  const [isViewingRooms, setIsViewingRooms] = useState(false);
 
   const handleCreateRoom = async () => {
     if (!roomName.trim() || !userId) {
@@ -29,7 +30,7 @@ export default function Home() {
       return;
     }
 
-    setIsLoading(true);
+    setIsCreatingRoom(true);
 
     try {
       const roomId = await createRoom(roomName, userId);
@@ -40,11 +41,12 @@ export default function Home() {
       console.error("Error creating room:", error);
       // Show error toast
     } finally {
-      setIsLoading(false);
+      setTimeout(() => setIsCreatingRoom(false), 2000);
     }
   };
 
   const handleViewAllRooms = () => {
+    setIsViewingRooms(true);
     router.push("/rooms");
   };
 
@@ -95,9 +97,9 @@ export default function Home() {
           <Button
             className="w-full"
             onClick={handleCreateRoom}
-            disabled={isLoading}
+            disabled={isCreatingRoom || isViewingRooms}
           >
-            {isLoading ? (
+            {isCreatingRoom ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating Room...
@@ -110,9 +112,18 @@ export default function Home() {
             className="w-full"
             variant="outline"
             onClick={handleViewAllRooms}
+            disabled={isCreatingRoom || isViewingRooms}
           >
             <List className="mr-2 h-4 w-4" />
-            View All Rooms
+
+            {isViewingRooms ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
+                Loading Rooms...
+              </>
+            ) : (
+              "View All Rooms"
+            )}
           </Button>
         </CardFooter>
       </Card>

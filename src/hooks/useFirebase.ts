@@ -16,11 +16,51 @@ import {
   getDoc,
 } from "firebase/firestore";
 
+interface Participant {
+  id: string;
+  name: string;
+}
+
+type RoomData = {
+  messages: Message[];
+  notes: string;
+  name: string;
+  elmoCount: number;
+  participants: Participant[];
+  agenda: AgendaItem[];
+  timer: number;
+  isActive: boolean;
+  currentAgendaItemIndex: number;
+  summary: MeetingSummary;
+};
+
+type Message = {
+  id: string;
+  userId: string;
+  message: string;
+  timestamp: Date;
+};
+
+type AgendaItem = {
+  id: string;
+  topic: string;
+  duration: number;
+};
+
+type MeetingSummary = {
+  startTime: Date | null | undefined;
+  endTime: Date | null | undefined;
+  duration: number;
+  decisions: string[];
+  actionItems: string[];
+  elmoTimestamps: (Date | string)[];
+};
+
 export function useFirebase(roomId?: string) {
   const [elmoCount, setElmoCount] = useState(0);
-  const [participants, setParticipants] = useState([]);
-  const [agenda, setAgenda] = useState([]);
-  const [summary, setSummary] = useState({
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [agenda, setAgenda] = useState<AgendaItem[]>([]);
+  const [summary, setSummary] = useState<MeetingSummary>({
     startTime: null,
     endTime: null,
     duration: 0,
@@ -29,7 +69,10 @@ export function useFirebase(roomId?: string) {
     elmoTimestamps: [],
   });
 
-  const [roomData, setRoomData] = useState({
+  const [roomData, setRoomData] = useState<RoomData>({
+    messages: [],
+    notes: "",
+    name: "",
     elmoCount: 0,
     participants: [],
     agenda: [],
@@ -51,21 +94,31 @@ export function useFirebase(roomId?: string) {
       const roomRef = doc(db, "rooms", roomId);
       const unsubscribe = onSnapshot(roomRef, (doc) => {
         if (doc.exists()) {
-          const data = doc.data() as any;
+          const data = doc.data() as RoomData;
           setRoomData(data);
           setElmoCount(data.elmoCount || 0);
           setParticipants(data.participants || []);
           setAgenda(data.agenda || []);
-          setSummary(
-            data.summary || {
-              startTime: null,
-              endTime: null,
-              duration: 0,
-              decisions: [],
-              actionItems: [],
-              elmoTimestamps: [],
-            },
-          );
+          setSummary((prevSummary) => {
+            const newSummary: MeetingSummary = {
+              ...prevSummary,
+              ...((data.summary as Partial<MeetingSummary>) || {}),
+            };
+
+            // Convert timestamp strings to Date objects if necessary
+            if (typeof newSummary.startTime === "string") {
+              newSummary.startTime = new Date(newSummary.startTime);
+            }
+            if (typeof newSummary.endTime === "string") {
+              newSummary.endTime = new Date(newSummary.endTime);
+            }
+            newSummary.elmoTimestamps = newSummary.elmoTimestamps.map(
+              (timestamp) =>
+                typeof timestamp === "string" ? new Date(timestamp) : timestamp,
+            );
+
+            return newSummary;
+          });
         }
       });
 
@@ -153,7 +206,7 @@ export function useFirebase(roomId?: string) {
   );
 
   const updateAgenda = useCallback(
-    async (newAgenda: string[]) => {
+    async (newAgenda: AgendaItem[]) => {
       if (roomId) {
         const roomRef = doc(db, "rooms", roomId);
         await updateDoc(roomRef, {
@@ -210,7 +263,7 @@ export function useFirebase(roomId?: string) {
       id: doc.id,
       ...doc.data(),
       timestamp: doc.data().timestamp?.toDate() || new Date(),
-    })) as ChatMessage[];
+    })) as Message[];
   }, [roomId]);
 
   const sendMessage = useCallback(

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,12 +14,13 @@ import Confetti from "react-confetti";
 import { Home, BarChart, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 
-export default function CompletePage({ params }: { params: { id: string } }) {
+export default function CompletePage({
+  params,
+}: {
+  params: { id: string; name: string };
+}) {
   const [isConfettiActive, setIsConfettiActive] = useState(true);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const roomName = searchParams.get("name") || "Unnamed Room";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -52,7 +52,7 @@ export default function CompletePage({ params }: { params: { id: string } }) {
       clearTimeout(timer);
       window.removeEventListener("resize", updateDimensions);
     };
-  }, []);
+  }, [isSoundEnabled]);
 
   const playAchievementSound = () => {
     if (audioRef.current) {
@@ -99,16 +99,16 @@ export default function CompletePage({ params }: { params: { id: string } }) {
             Congratulations!
           </CardTitle>
           <CardDescription className="text-center text-lg">
-            You've successfully completed the meeting:
+            You&apos;ve successfully completed the meeting:
           </CardDescription>
           <CardTitle className="text-2xl font-semibold text-center text-primary">
-            {roomName}
+            {params?.name}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p>Great job to you and your team for a productive session!</p>
           <p>
-            Don't forget to review the meeting summary and follow up on any
+            Don&apos;t forget to review the meeting summary and follow up on any
             action items.
           </p>
         </CardContent>

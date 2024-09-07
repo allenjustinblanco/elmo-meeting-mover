@@ -1,0 +1,44 @@
+{
+  "summary": {
+    "actionItems": [
+      "FDSAF"
+    ],
+    "startTime": {
+      "seconds": 1725689763,
+      "nanoseconds": 557000000
+    },
+    "decisions": [
+      "FDSA"
+    ],
+    "elmoTimestamps": [
+      "2024-09-07T06:13:05.248Z",
+      "2024-09-07T06:13:05.401Z"
+    ],
+    "duration": 0,
+    "endTime": {
+      "seconds": 1725689764,
+      "nanoseconds": 795000000
+    }
+  },
+  "participants": [],
+  "createdAt": {
+    "seconds": 1725689506,
+    "nanoseconds": 298000000
+  },
+  "agenda": [
+    {
+      "duration": 1,
+      "id": "1725689574691",
+      "topic": "FDSAF"
+    }
+  ],
+  "notes": "FDSAFSD",
+  "name": "ARIS",
+  "elmoCount": 0,
+  "createdBy": "user-y7p99qq26",
+  "lastElmoTimestamp": {
+    "seconds": 1725689585,
+    "nanoseconds": 672000000
+  },
+  "status": "active"
+}

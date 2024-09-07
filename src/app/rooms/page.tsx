@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -36,17 +36,13 @@ export default function Rooms() {
   const { toast } = useToast();
   const { getRooms, archiveRoom, deleteRoom } = useFirebase();
 
-  useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     setIsLoading(true);
     try {
       const { active, archived } = await getRooms();
       console.log(active, archived);
-      setActiveRooms(active as Room[]);
-      setArchivedRooms(archived as Room[]);
+      setActiveRooms(active as []);
+      setArchivedRooms(archived as []);
     } catch (error) {
       console.error("Error fetching rooms:", error);
       toast({
@@ -55,11 +51,15 @@ export default function Rooms() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setTimeout(() => setIsLoading(false), 1000);
     }
-  };
+  }, [getRooms, toast]);
 
-  const handleArchiveRoom = async (roomId: any) => {
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
+
+  const handleArchiveRoom = async (roomId: string) => {
     try {
       await archiveRoom(roomId);
       toast({
@@ -77,7 +77,7 @@ export default function Rooms() {
     }
   };
 
-  const handleDeleteRoom = async (roomId: any) => {
+  const handleDeleteRoom = async (roomId: string) => {
     try {
       await deleteRoom(roomId);
       toast({
@@ -111,7 +111,7 @@ export default function Rooms() {
     rooms: Array<{
       id: string;
       name: string;
-      participants?: Array<any>;
+      participants?: Array<string>;
       createdAt: { toDate: () => Date };
     }>;
     isArchived: boolean;

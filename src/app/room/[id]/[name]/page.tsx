@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,8 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
+  CardHeader,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,7 +51,17 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 
-export default function Room({ params }: { params: { id: string } }) {
+export type AgendaItem = {
+  id: string;
+  topic: string;
+  duration: number;
+};
+
+export default function Room({
+  params,
+}: {
+  params: { id: string; name: string };
+}) {
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [currentAgendaItemIndex, setCurrentAgendaItemIndex] = useState(0);
@@ -90,10 +99,14 @@ export default function Room({ params }: { params: { id: string } }) {
   });
 
   useEffect(() => {
-    if (!summary.startTime) {
-      startMeeting();
-    }
-    joinRoom(userId, userName);
+    const initializeRoom = async () => {
+      if (!summary.startTime) {
+        await startMeeting();
+      }
+      await joinRoom(userId, userName);
+    };
+    initializeRoom();
+
     const savedSettings = localStorage.getItem("elmoSettings");
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
@@ -102,11 +115,13 @@ export default function Room({ params }: { params: { id: string } }) {
     return () => {
       leaveRoom(userId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleCompleteRoom = () => {
+  const handleCompleteRoom = async () => {
+    await endMeeting();
     router.push(
-      `/room/${params.id}/complete?name=${encodeURIComponent(roomName)}`,
+      `/room/${params.id}/${params.name}/complete?name=${encodeURIComponent(roomName)}`,
     );
   };
 
@@ -162,7 +177,10 @@ export default function Room({ params }: { params: { id: string } }) {
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const currentAgendaItem = agenda[currentAgendaItemIndex];
+  const currentAgendaItem = agenda[currentAgendaItemIndex] as {
+    topic: ReactNode;
+    duration: number;
+  };
   const agendaItemProgress = currentAgendaItem
     ? (timer / (currentAgendaItem.duration * 60)) * 100
     : 0;
@@ -275,7 +293,9 @@ export default function Room({ params }: { params: { id: string } }) {
                   </SheetDescription>
                 </SheetHeader>
                 <RoomSettings
-                  settings={settings}
+                  settings={{
+                    ...settings,
+                  }}
                   onSettingsChange={handleSettingsChange}
                 />
               </SheetContent>

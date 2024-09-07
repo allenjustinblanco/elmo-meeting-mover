@@ -1,47 +1,55 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bell, Volume2, VolumeX, Save } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Bell, Volume2, VolumeX, Save } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RoomSettingsProps {
   settings: {
-    visualCue: string
-    soundEffect: string
-    elmoThreshold: number
-    darkMode: boolean
-    volume: number
-    autoEndMeeting: boolean
-    language: string
-    emailNotifications: boolean
-    pushNotifications: boolean
-  }
-  onSettingsChange: (newSettings: RoomSettingsProps['settings']) => void
+    visualCue: string;
+    soundEffect: string;
+    elmoThreshold: number;
+    darkMode: boolean;
+    volume: number;
+    autoEndMeeting: boolean;
+  };
+  onSettingsChange: (newSettings: RoomSettingsProps["settings"]) => void;
 }
 
-export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) {
-  const [localSettings, setLocalSettings] = useState(settings)
+export function RoomSettings({
+  settings,
+  onSettingsChange,
+}: RoomSettingsProps) {
+  const [localSettings, setLocalSettings] = useState(settings);
 
   const handleChange = (key: string, value: string | number | boolean) => {
-    const newSettings = { ...localSettings, [key]: value }
-    setLocalSettings(newSettings)
-  }
+    const newSettings = { ...localSettings, [key]: value };
+    setLocalSettings(newSettings);
+  };
 
   const handleSave = () => {
-    onSettingsChange(localSettings)
-  }
+    onSettingsChange(localSettings);
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Room Settings</CardTitle>
-        <CardDescription>Customize your ELMO meeting experience</CardDescription>
+        <CardDescription>
+          Customize your ELMO meeting experience
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px] pr-4">
@@ -50,7 +58,7 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
               <Label>Visual Cue</Label>
               <RadioGroup
                 value={localSettings.visualCue}
-                onValueChange={(value) => handleChange('visualCue', value)}
+                onValueChange={(value) => handleChange("visualCue", value)}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="flash" id="flash" />
@@ -71,7 +79,7 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
               <Label>Sound Effect</Label>
               <RadioGroup
                 value={localSettings.soundEffect}
-                onValueChange={(value) => handleChange('soundEffect', value)}
+                onValueChange={(value) => handleChange("soundEffect", value)}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="bell" id="bell" />
@@ -97,7 +105,9 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
                   min="1"
                   max="10"
                   value={localSettings.elmoThreshold}
-                  onChange={(e) => handleChange('elmoThreshold', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleChange("elmoThreshold", parseInt(e.target.value))
+                  }
                   className="w-20"
                 />
                 <span className="text-sm text-muted-foreground">
@@ -112,7 +122,7 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
                 <VolumeX className="h-4 w-4" />
                 <Slider
                   value={[localSettings.volume]}
-                  onValueChange={(value) => handleChange('volume', value[0])}
+                  onValueChange={(value) => handleChange("volume", value[0])}
                   max={100}
                   step={1}
                 />
@@ -124,7 +134,7 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
               <Switch
                 id="darkMode"
                 checked={localSettings.darkMode}
-                onCheckedChange={(checked) => handleChange('darkMode', checked)}
+                onCheckedChange={(checked) => handleChange("darkMode", checked)}
               />
               <Label htmlFor="darkMode">Dark Mode</Label>
             </div>
@@ -133,48 +143,13 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
               <Switch
                 id="autoEndMeeting"
                 checked={localSettings.autoEndMeeting}
-                onCheckedChange={(checked) => handleChange('autoEndMeeting', checked)}
+                onCheckedChange={(checked) =>
+                  handleChange("autoEndMeeting", checked)
+                }
               />
-              <Label htmlFor="autoEndMeeting">Auto-end meeting when agenda is complete</Label>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Language</Label>
-              <Select
-                value={localSettings.language}
-                onValueChange={(value) => handleChange('language', value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                  <SelectItem value="ja">日本語</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Notification Settings</Label>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="emailNotifications"
-                  checked={localSettings.emailNotifications}
-                  onCheckedChange={(checked) => handleChange('emailNotifications', checked)}
-                />
-                <Label htmlFor="emailNotifications">Email Notifications</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="pushNotifications"
-                  checked={localSettings.pushNotifications}
-                  onCheckedChange={(checked) => handleChange('pushNotifications', checked)}
-                />
-                <Label htmlFor="pushNotifications">Push Notifications</Label>
-              </div>
+              <Label htmlFor="autoEndMeeting">
+                Auto-end meeting when agenda is complete
+              </Label>
             </div>
           </div>
         </ScrollArea>
@@ -190,5 +165,5 @@ export function RoomSettings({ settings, onSettingsChange }: RoomSettingsProps) 
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
