@@ -1,0 +1,24 @@
+{
+  "createdAt": {
+    "seconds": 1725682687,
+    "nanoseconds": 527000000
+  },
+  "participants": [],
+  "createdBy": "user-y7p99qq26",
+  "status": "active",
+  "name": "FESIMS",
+  "elmoCount": 0,
+  "notes": "fdsafdafdsfasdfdsafsd",
+  "agenda": [
+    {
+      "duration": 2,
+      "id": "1725684572187",
+      "topic": "fddsaf"
+    },
+    {
+      "id": "1725684575862",
+      "duration": 5,
+      "topic": "fdsafd"
+    }
+  ]
+}
